@@ -1,0 +1,30 @@
+/*
+    loader.c
+
+    Implementations of the functions in loader.h.
+*/
+
+#include "proc/loader.h"
+#include "klib/io.h"
+#include "klib/asm.h"
+#include "klib/memory.h"
+
+static struct ProgramLoader loader;
+
+static void load(string path, u32 bytes) {
+    fread(path, (voidptr)LOAD_ADDRESS, bytes);
+}
+
+static void exec(void) {
+    void (*func)(void) = (void (*)())LOAD_ADDRESS;
+    func();
+}
+
+void init_program_loader(void) {
+    loader.load = load;
+    loader.exec = exec;
+}
+
+struct ProgramLoader* get_program_loader() {
+    return &loader;
+}

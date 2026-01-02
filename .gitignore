@@ -1,0 +1,6 @@
+.vscode/
+.cache/
+binaries/
+obj/
+images/
+compile_commands.json

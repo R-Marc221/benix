@@ -1,0 +1,28 @@
+; gdt_flush.asm
+;
+; Implementation of gdt_flush() from gdt.h.
+;
+
+[bits 32]
+
+section .text
+global gdt_flush
+
+gdt_flush:
+    mov eax, [esp + 4]
+    lgdt [eax]
+
+    push 0x08
+    lea eax, [rel next]
+    push eax
+    retf
+
+next:
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+
+    ret
