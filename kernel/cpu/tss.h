@@ -23,5 +23,5 @@ struct __attribute__((packed)) TSS {
 };
 
 void init_tss(void);
-void tss_flush(u32 ss, u32 esp);
+void tss_flush();
 struct TSS* get_tss(void);

@@ -21,7 +21,7 @@ isr_stub_%+%1:
 %endmacro
 
 section .text
-global syscall_stub, irq1_stub
+global irq1_stub, syscall_stub
 extern exception_handler, syscall_handler, irq1_handler
 
 isr_no_err_stub 0
@@ -114,24 +114,27 @@ isr_common:
     iret
 
 syscall_stub:
-    pusha
     push ds
     push es
     push fs
     push gs
 
+    pushad
+
     mov ax, 0x10
     mov ds, ax
     mov es, ax
+    mov fs, ax
+    mov gs, ax
 
     push esp
     call syscall_handler
     add esp, 4
 
+    popad
     pop gs
     pop fs
     pop es
     pop ds
-    popa
 
     iretd

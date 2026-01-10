@@ -25,11 +25,11 @@ void init_gdt(void) {
         .base = (u32)&gdt.entries
     };
 
-    set_entry(0, 0, 0, 0, 0);               // null
-    set_entry(1, 0, 0xfffff, 0x9a, 0xc0);    // kernel cs
-    set_entry(2, 0, 0xfffff, 0x92, 0xc0);    // kernel ds
-    set_entry(3, 0, 0xfffff, 0xfa, 0xcf);    // user cs
-    set_entry(4, 0, 0xfffff, 0xf2, 0xcf);    // user ds
+    set_entry(0, 0, 0, 0, 0);                   // null
+    set_entry(1, 0, 0xfffff, 0x9a, 0xc0);       // kernel cs
+    set_entry(2, 0, 0xfffff, 0x92, 0xc0);       // kernel ds
+    set_entry(3, 0, 0xfffff, 0xfa, 0xcf);       // user cs
+    set_entry(4, 0, 0xfffff, 0xf2, 0xcf);       // user ds
 
     gdt_flush(&gdt.pointer);
 }

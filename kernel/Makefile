@@ -3,20 +3,21 @@ CC			:= gcc
 LD          := ld
 
 ASMFLAGS    := -f elf32
-CFLAGS		:= -m32 -ffreestanding -nostdlib -nostdinc -fno-pic -fno-pie -g -c -Ikernel
+CFLAGS		:= -m32 -ffreestanding -nostdlib -nostdinc -fno-pic -fno-pie \
+				-mno-sse -mno-mmx -mno-sse2 -fno-tree-vectorize -g -c -I.
 LDFLAGS     := -m elf_i386 -T linker.ld
 
-SRC_DIR     := kernel
+SRC_DIR     := .
 OBJ_DIR     := obj
-TARGET      := binaries/kernel.bin
+TARGET      := ../binaries/kernel.bin
 
 ASM_FILES   := $(shell find $(SRC_DIR) -name '*.asm')
-SD_FILES	:= $(shell find $(SRC_DIR) -name '*.c')
+C_FILES	:= $(shell find $(SRC_DIR) -name '*.c')
 
 ASM_OBJ := $(patsubst $(SRC_DIR)/%.asm,$(OBJ_DIR)/%.o,$(ASM_FILES))
-SD_OBJ := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SD_FILES))
+C_OBJ := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(C_FILES))
 
-OBJ_FILES := $(ASM_OBJ) $(SD_OBJ)
+OBJ_FILES := $(ASM_OBJ) $(C_OBJ)
 
 .PHONY: all clean
 

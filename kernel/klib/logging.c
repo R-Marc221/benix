@@ -7,7 +7,7 @@
 #include "klib/logging.h"
 #include "klib/io.h"
 #include "klib/args.h"
-#include "consoles/console.h"
+#include "drivers/console.h"
 
 void log(log_level_t level, string s, ...) {
     va_list args;

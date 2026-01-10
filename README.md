@@ -10,7 +10,7 @@ Benix is a small 32-bit hobby operating system for x86 I made for fun and learni
 - FAT12
 - VGA
 - Console
-### Loadable binary formats
+### Executable file formats
 - Flat binary
 ### Userspace
 - Syscalls

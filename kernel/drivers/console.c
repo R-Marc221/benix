@@ -4,7 +4,7 @@
     Implementations of the functions in console.h.
 */
 
-#include "consoles/console.h"
+#include "drivers/console.h"
 
 static struct DriverConsole driver_console;
 
@@ -35,7 +35,8 @@ static void putchar(u8 c) {
             break;
 
         case '\b':
-            driver_console.cursor.move(driver_console.cursor.x - 1, driver_console.cursor.y);
+            if (driver_console.cursor.x > 0)
+                driver_console.cursor.move(driver_console.cursor.x - 1, driver_console.cursor.y);
             break;
 
         case '\t':
@@ -50,8 +51,7 @@ static void putchar(u8 c) {
 
     if (driver_console.cursor.y >= driver_console.height) {
         driver_console.driver_vga->clear(driver_console.cursor.fg, driver_console.cursor.bg);
-        driver_console.cursor.x = 0;
-        driver_console.cursor.y = 0;
+        driver_console.cursor.move(0, 0);
     }
 }
 
@@ -65,13 +65,12 @@ static void print(string s) {
 
 static void clear(void) {
     driver_console.driver_vga->clear(driver_console.cursor.fg, driver_console.cursor.bg);
-    driver_console.cursor.x = 0;
-    driver_console.cursor.y = 0;
+    driver_console.cursor.move(0, 0);
 }
 
-void init_driver_console(struct DriverConsole *driver_console, struct DriverVGA *driver_vga) {
-    driver_console->driver_vga = driver_vga;
-    driver_console->cursor = (struct ConsoleCursor){
+void init_driver_console(struct DriverVGA *driver_vga) {
+    driver_console.driver_vga = driver_vga;
+    driver_console.cursor = (struct ConsoleCursor){
         .x = 0,
         .y = 0,
         .fg = VGA_WHITE,
@@ -80,12 +79,12 @@ void init_driver_console(struct DriverConsole *driver_console, struct DriverVGA 
         .set_color = set_cursor_color,
         .move = move_cursor
     };
-    driver_console->height = driver_vga->height;
-    driver_console->width = driver_vga->width;
+    driver_console.height = driver_vga->height;
+    driver_console.width = driver_vga->width;
 
-    driver_console->putchar = putchar;
-    driver_console->print = print;
-    driver_console->clear = clear;
+    driver_console.putchar = putchar;
+    driver_console.print = print;
+    driver_console.clear = clear;
 }
 
 struct DriverConsole* get_driver_console(void) {

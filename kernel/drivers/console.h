@@ -29,5 +29,5 @@ struct DriverConsole {
     void (*clear)(void);
 };
 
-void init_driver_console(struct DriverConsole* driver_console, struct DriverVGA* driver_vga);
+void init_driver_console(struct DriverVGA* driver_vga);
 struct DriverConsole* get_driver_console(void);

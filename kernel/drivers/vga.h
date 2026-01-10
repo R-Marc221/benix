@@ -53,5 +53,5 @@ struct DriverVGA {
     void (*clear)(vga_color_t fg, vga_color_t bg);
 };
 
-void init_driver_vga(struct DriverVGA *driver_vga);
+void init_driver_vga(void);
 struct DriverVGA* get_driver_vga(void);

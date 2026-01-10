@@ -1,0 +1,33 @@
+NASM        := nasm
+CC          := gcc
+LD          := ld
+
+ASMFLAGS    := -f elf32
+CFLAGS      := -m32 -ffreestanding -nostdlib -nostdinc -fno-pic -fno-pie \
+				-mno-sse -mno-mmx -mno-sse2 -fno-tree-vectorize -g -c -I.
+
+SRC_DIR     := .
+OBJ_DIR     := ../obj/benlibc
+
+ASM_FILES   := $(shell find $(SRC_DIR) -name '*.asm')
+C_FILES     := $(shell find $(SRC_DIR) -name '*.c')
+
+ASM_OBJ     := $(patsubst $(SRC_DIR)/%.asm,$(OBJ_DIR)/%.o,$(ASM_FILES))
+C_OBJ       := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(C_FILES))
+
+OBJ_FILES   := $(ASM_OBJ) $(C_OBJ)
+
+.PHONY: all clean
+
+all: $(OBJ_FILES)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.asm
+	@mkdir -p $(dir $@)
+	$(NASM) $(ASMFLAGS) $< -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $< -o $@
+
+clean:
+	rm -rf $(OBJ_DIR)

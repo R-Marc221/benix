@@ -15,7 +15,7 @@ enter_usermode:
     mov gs, ax
 
     push 0x23
-    push eax
+    push 0x20000
     pushf
     pop eax
     or eax, 0x200

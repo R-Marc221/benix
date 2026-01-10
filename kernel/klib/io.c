@@ -7,7 +7,7 @@
 #include "klib/io.h"
 #include "klib/bool.h"
 #include "klib/string.h"
-#include "consoles/console.h"
+#include "drivers/console.h"
 #include "drivers/fs/fat12.h"
 #include "drivers/keyboard.h"
 #include "types.h"

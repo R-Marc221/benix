@@ -34,14 +34,14 @@ static void clear(vga_color_t fg, vga_color_t bg) {
     }
 }
 
-void init_driver_vga(struct DriverVGA *driver_vga) {
-    driver_vga->buffer = (u16*)STD_VGA_BUFFER;
-    driver_vga->height = STD_VGA_HEIGHT;
-    driver_vga->width = STD_VGA_WIDTH;
+void init_driver_vga(void) {
+    driver_vga.buffer = (u16*)STD_VGA_BUFFER;
+    driver_vga.height = STD_VGA_HEIGHT;
+    driver_vga.width = STD_VGA_WIDTH;
 
-    driver_vga->putchar = putchar;
-    driver_vga->move_cursor = move_cursor;
-    driver_vga->clear = clear;
+    driver_vga.putchar = putchar;
+    driver_vga.move_cursor = move_cursor;
+    driver_vga.clear = clear;
 }
 
 struct DriverVGA* get_driver_vga(void) {

@@ -1,39 +1,46 @@
 #include "cpu/interrupts/syscalls.h"
 #include "klib/io.h"
-#include "consoles/console.h"
+#include "drivers/console.h"
 
 /*
-    1: print string (printstr)
-    2: read character from keyboard (readchar)
-    3: print character (printchar)
-    4: clear screen (cls)
-    5: read file (fread)
-    6: list directory (lsdir)
+    1: print character (printchar)
+    2: print string (printstr)
+    3: clear screen (cls)
+    4: read file (fread)
+    5: read directory content (lsdir)
+    6: read character from keyboard (readchar)
+
+    Bad syscall: EAX = -1
 */
-void syscall_handler(struct SyscallRegisters *registers) {
-    switch (registers->eax) {
+void syscall_handler(struct SyscallRegisters* r) {
+    switch (r->eax) {
+
         case 1:
-            print((string)registers->ebx);
+            putchar((char)r->ebx);
             break;
 
         case 2:
-            registers->ecx = getchar();
+            print((string)r->ebx);
             break;
 
         case 3:
-            putchar(registers->ebx);
-            break;
-
-        case 4:
             get_driver_console()->clear();
             break;
 
+        case 4:
+            fread((string)r->ebx, (u8*)r->ecx, r->edx);
+            break;
+
         case 5:
-            fread((string)registers->ebx, (u8*)registers->ecx, registers->edx);
+            lsdir((string)r->ebx);
             break;
 
         case 6:
-            lsdir((string)registers->ebx);
+            r->eax = getchar();
+            break;
+
+        default:
+            r->eax = (u32)-1;
             break;
     }
 }
