@@ -180,10 +180,20 @@ char getchar() {
 
 void getstrend(string buf, char end) {
     u32 i = 0;
-    char c;
+    char c = 0;
     while (c != end) {
         c = getchar();
         if (c) {
+            if (c == '\b') {
+                if (i == 0) {
+                    continue;
+                }
+                i--;
+                putchar(c);
+                putchar(' ');
+                putchar('\b');
+                continue;
+            }
             putchar(c);
             buf[i++] = c;
         }
@@ -231,10 +241,14 @@ void itoa(i32 i, string buffer, i32 base) {
     }
 }
 
-void fread(const string path, u8* buffer, u32 size) {
-    get_fsdriver_fat12()->read_file(path, buffer, size);
+i32 fread(const string path, u8* buffer, u32 size) {
+    return get_fsdriver_fat12()->read_file(path, buffer, size);
 }
 
 void lsdir(string buffer) {
     get_fsdriver_fat12()->read_dir(buffer);
+}
+
+i32 findfile(string path) {
+    return get_fsdriver_fat12()->lookup(path);
 }

@@ -11,12 +11,13 @@
 
 static struct ProgramLoader loader;
 
-static void load(string path, u32 bytes) {
-    fread(path, (voidptr)LOAD_ADDRESS, bytes);
+static void load(string path, u32 bytes, u32 address, struct CommandLineArguments* args) {
+    memmove((voidptr)ARGUMENTS_ADDRESS, args, sizeof(struct CommandLineArguments));
+    fread(path, (u8*)address, bytes);
 }
 
 static void exec(void) {
-    void (*func)(void) = (void (*)())LOAD_ADDRESS;
+    void (*func)(void) = (void (*)())SHELL_ADDRESS;
     func();
 }
 

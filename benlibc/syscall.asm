@@ -2,7 +2,7 @@
 
 section .text
 global syscall_printchar, syscall_printstr, syscall_cls, syscall_fread, syscall_lsdir
-global syscall_getchar
+global syscall_getchar, syscall_ffind
 
 syscall_printchar:
     mov eax, 1
@@ -37,5 +37,11 @@ syscall_lsdir:
 
 syscall_getchar:
     mov eax, 6
+    int 0x80
+    ret
+
+syscall_ffind:
+    mov eax, 7
+    mov ebx, [esp + 4]
     int 0x80
     ret

@@ -1,6 +1,8 @@
 # The Benix Operating System
 Benix is a small 32-bit hobby operating system for x86 I made for fun and learning. It is written in Assembly (Intel syntax) and C. Every part of the OS has been made from scratch, from the bootloader to the user space.
 
+![Benix showcase 0][assets/benix_showcase0.png]
+
 ## Features
 ### Drivers
 - PIC
@@ -15,25 +17,34 @@ Benix is a small 32-bit hobby operating system for x86 I made for fun and learni
 ### Userspace
 - Syscalls
 - User programs
+- Shell (CASH)
+### Libraries
+- Benlibc (a small libc for userspace programs)
+- Klib (C library embedded in the kernel)
 
 ## Build instructions
 First, you need to clone the git repository. If you don't have git, you can install it from your distribution packages.
 ```sh
 git clone https://github.com/wither16x/benix
 ```
-Next, you can either just build it or build and run it in the qemu emulator.
-To build it:
+Benix does not use BASH, ZSH or any other standard shell scripting language for its build scripts. Instead, it uses [the Amber programming language](https://github.com/amber-lang/amber). Make sure it is installed on your system and run the following command:
 ```sh
-chmod +x build.sh
-./build.sh
+amber scripts/build.ab
 ```
-The floppy image should be available in images/benix.img.
-To build and run it in qemu:
+Now, a floppy image should be available in `images/`, with a secondary FAT12 image.
+If you have `qemu` and you want to try Benix on it, execute the command below:
 ```sh
-chmod +x run.sh
-./run.sh
+amber scripts/run.ab
 ```
 **Benix has not been tried on real hardware yet!**
+
+## Programs
+Several programs are provided within the Benix disk image. Their source code is located inside the `programs/` directory, **but they will be moved in separated repositories soon**.
+- `cash` (Certainly Amazing SHell): the default shell for Benix
+- `ls`: displays a list of the files
+- `show <filename>`: displays the content of a file in ASCII
+- `info`: displays informations about the system (these informations are located in `osinfo.txt`)
+- `echo [text]`: displays the given text followed by a newline in the console
 
 ## Documentation
 There is no real documentation. Some of the code has comments, but you still need Assembly and C knowledge to understand what it does if it is not clearly explained or not explained at all...

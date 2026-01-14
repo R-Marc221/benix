@@ -7,8 +7,29 @@
 #include "drivers/fs/fat12.h"
 #include "drivers/ata.h"
 #include "klib/memory.h"
+#include "klib/string.h"
+#include "klib/null.h"
 
 static struct DriverFS_FAT12 fs;
+
+static void format_filename(const string input, string out) {
+    memset(out, ' ', FILENAME_CHARS);
+
+    const string dot = strchr(input, '.');
+    size_t name_len = dot ? (size_t)(dot - input) : strlen(input);
+    size_t ext_len  = dot ? strlen((string)dot + 1) : 0;
+
+    if (name_len > 8) name_len = NAME_CHARS;
+    if (ext_len  > 3) ext_len  = EXTENSION_CHARS;
+
+    for (size_t i = 0; i < name_len; i++) {
+        out[i] = toupper(input[i]);
+    }
+
+    for (size_t i = 0; i < ext_len; i++) {
+        out[8 + i] = toupper(dot[1 + i]);
+    }
+}
 
 static u16 get_next_cluster(u16 cluster) {
     u32 fat_offset = cluster + cluster / 2;
@@ -38,9 +59,13 @@ static void read_cluster(u16 cluster, voidptr buffer) {
 }
 
 static i32 read_file(const string filename, voidptr buffer, u32 buffer_size) {
+    char formatted_filename[FILENAME_CHARS];
+    format_filename(filename, formatted_filename);
+
     u32 rootdir_entries = fs.bpb.rootdir_entry_count;
     u32 sector = fs.rootdir_start_sector;
     u8 sector_buffer[SECTOR_SIZE];
+    u32 initial_buffer_size = buffer_size;
 
     for (u32 i = 0; i < (rootdir_entries * 32 + SECTOR_SIZE - 1) / SECTOR_SIZE; i++) {
         get_driver_ata()->read(sector + i, (u16*)sector_buffer);
@@ -53,7 +78,7 @@ static i32 read_file(const string filename, voidptr buffer, u32 buffer_size) {
             if ((entry->attributes & 0x0f) == 0x0f)
                 continue;
 
-            if (memcmp(entry->name, filename, 8) == 0) {
+            if (memcmp(entry->name, formatted_filename, 8) == 0) {
                 u16 cluster = entry->first_cluster_low;
                 u32 remaining = entry->file_size;
                 u8* ptr = (u8*)buffer;
@@ -70,11 +95,13 @@ static i32 read_file(const string filename, voidptr buffer, u32 buffer_size) {
                     buffer_size -= to_copy;
                     remaining -= to_copy;
 
-                    if (buffer_size == 0) break;
+                    if (buffer_size == 0)
+                        break;
+
                     cluster = get_next_cluster(cluster);
                 }
 
-                return 0;
+                return initial_buffer_size - buffer_size;
             }
         }
     }
@@ -99,7 +126,7 @@ static i32 read_dir(string buffer) {
             if ((entry->attributes & 0x0f) == 0x0f)
                 continue;
 
-            for (u32 k = 0; k < 11; k++) {
+            for (u32 k = 0; k < FILENAME_CHARS; k++) {
                 buffer[out++] = entry->name[k];
             }
 
@@ -113,11 +140,51 @@ static i32 read_dir(string buffer) {
     return 0;
 }
 
+static i32 lookup(const string filename) {
+    char formatted_filename[11];
+    format_filename(filename, formatted_filename);
+
+    u32 rootdir_entries = fs.bpb.rootdir_entry_count;
+    u32 sector = fs.rootdir_start_sector;
+    u8 sector_buffer[SECTOR_SIZE];
+    u8 buffer[11];
+    u32 out = 0;
+
+    for (u32 i = 0; i < (rootdir_entries * 32 + SECTOR_SIZE - 1) / SECTOR_SIZE; i++) {
+        get_driver_ata()->read(sector + i, (u16*)sector_buffer);
+
+        for (u32 j = 0; j < SECTOR_SIZE; j += 32) {
+            struct FAT12_DirectoryEntry* entry = (struct FAT12_DirectoryEntry*)&sector_buffer[j];
+
+            if (entry->name[0] == 0)
+                goto done;
+            if ((entry->attributes & 0x0f) == 0x0f)
+                continue;
+
+            for (u32 k = 0; k < FILENAME_CHARS; k++) {
+                buffer[out++] = entry->name[k];
+            }
+            buffer[out] = '\0';
+            formatted_filename[out] = '\0';
+
+            if (strcmp((string)buffer, formatted_filename) == 0) {
+                return 1;
+            }
+
+            out = 0;
+        }
+    }
+
+    done:
+    return 0;
+}
+
 void init_fsdriver_fat12(void) {
     fs.get_next_cluster = get_next_cluster;
     fs.read_cluster = read_cluster;
     fs.read_file = read_file;
     fs.read_dir = read_dir;
+    fs.lookup = lookup;
 
     u8 sector[512];
     get_driver_ata()->read(0, (u16*)sector);

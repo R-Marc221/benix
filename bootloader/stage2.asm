@@ -95,7 +95,7 @@ pmode_init:
     mov fs, ax
     mov gs, ax
     mov ss, ax
-    mov esp, 0x90000
+    mov esp, 0x80000
 
     jmp 0x08:0x10000            ; jump to the kernel
 

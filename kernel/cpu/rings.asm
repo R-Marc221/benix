@@ -6,7 +6,7 @@ global enter_usermode
 enter_usermode:
     cli
 
-    mov eax, [esp + 4]
+    mov ebx, [esp + 4]
 
     mov ax, 0x23
     mov ds, ax
@@ -15,11 +15,12 @@ enter_usermode:
     mov gs, ax
 
     push 0x23
-    push 0x20000
+    push 0x200000
     pushf
     pop eax
     or eax, 0x200
     push eax
     push 0x1b
-    push 0x80000
+    push ebx
+
     iret

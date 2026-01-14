@@ -9,12 +9,12 @@
     4: read file (fread)
     5: read directory content (lsdir)
     6: read character from keyboard (readchar)
+    7: check if a file exists (ffind)
 
     Bad syscall: EAX = -1
 */
 void syscall_handler(struct SyscallRegisters* r) {
     switch (r->eax) {
-
         case 1:
             putchar((char)r->ebx);
             break;
@@ -28,7 +28,7 @@ void syscall_handler(struct SyscallRegisters* r) {
             break;
 
         case 4:
-            fread((string)r->ebx, (u8*)r->ecx, r->edx);
+            r->eax = fread((string)r->ebx, (u8*)r->ecx, r->edx);
             break;
 
         case 5:
@@ -37,6 +37,10 @@ void syscall_handler(struct SyscallRegisters* r) {
 
         case 6:
             r->eax = getchar();
+            break;
+
+        case 7:
+            r->eax = findfile((string)r->ebx);
             break;
 
         default:

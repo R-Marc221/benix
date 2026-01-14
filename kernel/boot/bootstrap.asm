@@ -12,7 +12,7 @@ extern kmain
 
 _start:
     cli
-    mov esp, 0x90000
+    mov esp, 0x80000
 
     call kmain
 

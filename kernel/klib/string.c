@@ -28,15 +28,24 @@ string strchr(string s, i32 c) {
 
 string strtok(string s, const string delim) {
     static string next = NULL;
-    next = s;
-    while (*next && strchr(delim, *next)) {
+
+    if (s != NULL)
+        next = s;
+    else if (next == NULL)
+        return NULL;
+
+    while (*next && strchr(delim, *next))
         next++;
+
+    if (*next == '\0') {
+        next = NULL;
+        return NULL;
     }
 
     string start = next;
-    while (*next && !strchr(delim, *next)) {
+
+    while (*next && !strchr(delim, *next))
         next++;
-    }
 
     if (*next) {
         *next = '\0';
@@ -46,4 +55,20 @@ string strtok(string s, const string delim) {
     }
 
     return start;
+}
+
+i32 strcmp(string s1, string s2) {
+    while ((*s1 != '\0' && *s2 != '\0') && *s1 == *s2) {
+        s1++;
+        s2++;
+    }
+
+    return (*s1 == *s2) ? 0 : (*s1 > *s2) ? 1 : -1;
+}
+
+i32 toupper(i32 c) {
+    if (c >= 'a' && c <= 'z') {
+        return  c - ('a' - 'A');
+    }
+    return c;
 }

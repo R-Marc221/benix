@@ -14,3 +14,7 @@ u32 strlen(string s);
 string strchr(string s, i32 c);
 // Tokenize a string
 string strtok(string s, const string delim);
+// Compare two strings
+i32 strcmp(string s1, string s2);
+// Convert a character to uppercase
+i32 toupper(i32 c);

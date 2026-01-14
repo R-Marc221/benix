@@ -8,6 +8,10 @@
 
 #include "klib/types.h"
 
+#define FILENAME_CHARS                  11
+#define NAME_CHARS                      8
+#define EXTENSION_CHARS                 3
+
 // BIOS Parameter Block (BPB)
 struct __attribute__((packed)) FAT12_BPB {
     u8 jmp[3];                  // jmp + nop
@@ -33,7 +37,7 @@ struct __attribute__((packed)) FAT12_BPB {
     u16 mbr_signature;
 };
 
-struct FAT12_DirectoryEntry {
+struct __attribute__((packed)) FAT12_DirectoryEntry {
     u8 name[8];
     u8 ext[3];
     u8 attributes;
@@ -59,6 +63,7 @@ struct DriverFS_FAT12 {
     void (*read_cluster)(u16 cluster, voidptr buffer);
     i32 (*read_file)(const string filename, voidptr buffer, u32 buffer_size);
     i32 (*read_dir)(string buffer);
+    i32 (*lookup)(const string filename);
 };
 
 void init_fsdriver_fat12(void);

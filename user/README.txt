@@ -1,4 +1,4 @@
-The Benix Operating System (version 0.0.0) by Wither__
+The Benix Operating System (by Wither__)
 ======================================================
 Welcome on Benix, dear user!
 This is a small hobby operating system (OS) I made for fun and experimentation.

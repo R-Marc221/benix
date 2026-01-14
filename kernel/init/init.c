@@ -1,6 +1,7 @@
 #include "init/init.h"
 #include "drivers/vga.h"
 #include "drivers/console.h"
+#include "klib/io.h"
 #include "klib/logging.h"
 #include "cpu/gdt.h"
 #include "cpu/interrupts/idt.h"
@@ -11,6 +12,7 @@
 #include "drivers/fs/fat12.h"
 #include "proc/loader.h"
 #include "cpu/tss.h"
+#include "klib/null.h"
 
 void install_video(void) {
     init_driver_vga();
@@ -61,8 +63,12 @@ void install_drivers(void) {
 
 void install_proc(void) {
     init_program_loader();
-    get_program_loader()->load("WELCOME BIN", 512*50);
-    info("loaded user program");
+    if (!findfile("cash")) {
+        error("CASH not found");
+    } else {
+        get_program_loader()->load("cash", 512 * 10, SHELL_ADDRESS, NULL);
+        info("loaded user program");
+    }
 }
 
 void install_tss(void) {

@@ -2,4 +2,4 @@
 
 #include "klib/types.h"
 
-void enter_usermode(u32 esp0);
+void enter_usermode(u32 ueip);

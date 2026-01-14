@@ -1,5 +1,30 @@
 # Benix changelog
 
+## Version 0.0.2
+- General:
+    - updated build instructions in `README.md`
+- Benlibc:
+    - a lot of improvements (new headers and functions)
+- Memory:
+    - remade memory map
+- Userspace:
+    - added programs: `cash`, `ls`, `show`, `info`, `echo`
+    - remade `enter_usermode()`
+    - added syscall 7 (`ffind`)
+    - added `osinfo.txt`
+    - removed OS version from `README.txt`
+- Drivers:
+    - added private function `format_filename()` to the FAT12 driver
+    - added public function `lookup()` to the FAT12 driver
+- Klib:
+    - added function `toupper()`
+    - fixed `strtok()`
+    - added function `findfile()`
+    - fixed `getstrend()` by initializing `c` since it corrupted the memory. Backspaces are now handled correctly
+- Build:
+    - now using Amber instead of BASH for the scripts
+    - scripts are now located in `scripts/`
+
 ## Version 0.0.1
 - Updated `welcome.c`
 - Fixed switch to usermode, so that syscalls do not make #UD happen anymore

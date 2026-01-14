@@ -1,0 +1,52 @@
+// Note: this code is certainly dirty, and I'm sorry about that.
+// If you have better knowledge in Amber and want to rewrite it, then thank you.
+//
+
+import { set_e, mkdir, make, nasm, dd, dd_copy, mkfs_fat, mcopy } from "./utils.ab"
+
+pub fun build() {
+    set_e()
+
+    let build_directories = ["binaries", "binaries/user", "images"]
+    let dir_bootloader = "bootloader"
+    let bootloader_files = ["bootsect", "stage2"]
+    let dir_kernel = "kernel"
+    let dir_benlibc = "benlibc"
+    let dir_user = "user"
+    let user_programs = ["cash", "ls", "show", "info", "echo"]
+
+    for d in build_directories {
+        mkdir(d)
+    }
+
+    make(dir_kernel)
+    make(dir_benlibc)
+
+    for p in user_programs {
+        make("{dir_user}/{p}")
+    }
+
+    for f in bootloader_files {
+        nasm("binaries/{f}.bin", "{dir_bootloader}/{f}.asm")
+    }
+
+    dd("/dev/zero", "images/benix.img", 512, 2880)
+    dd("/dev/zero", "images/floppy2.img", 512, 2880)
+    mkfs_fat(12, "images/floppy2.img")
+    
+    mcopy("images/floppy2.img", "{dir_user}/README.txt", "::")
+    mcopy("images/floppy2.img", "{dir_user}/osinfo.txt", "::")
+    mcopy("images/floppy2.img", "binaries/user/cash", "::")
+    mcopy("images/floppy2.img", "binaries/user/ls", "::")
+    mcopy("images/floppy2.img", "binaries/user/show", "::")
+    mcopy("images/floppy2.img", "binaries/user/info", "::")
+    mcopy("images/floppy2.img", "binaries/user/echo", "::")
+
+    dd_copy("binaries/bootsect.bin", "images/benix.img", 0)
+    dd_copy("binaries/stage2.bin", "images/benix.img", 1)
+    dd_copy("binaries/kernel.bin", "images/benix.img", 2)
+}
+
+main(args) {
+    build()
+}

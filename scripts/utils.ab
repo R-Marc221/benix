@@ -1,0 +1,51 @@
+pub fun set_e() {
+    $ set -e $ failed {
+        echo "set -e failed"
+    }
+}
+
+pub fun mkdir(name: Text) {
+    $ mkdir -p {name} $ failed {
+        echo "Failed to create directory: {name}"
+    }
+}
+
+pub fun make(dir: Text) {
+    $ make -C {dir} clean $ failed {
+        echo "Failed to clean build for {dir}"
+    }
+
+    $ make -C {dir} $ failed {
+        echo "Failed to build {dir}"
+    }
+}
+
+pub fun nasm(output: Text, file: Text) {
+    $ nasm -f bin -o {output} {file} $ failed {
+        echo "Failed to assemble {file}"
+    }
+}
+
+pub fun dd(input_file: Text, output_file: Text, bs: Int, count: Int) {
+    $ dd if={input_file} of={output_file} bs={bs} count={count} conv=notrunc $ failed {
+        echo "dd failed: {input_file}, {output_file}"
+    }
+}
+
+pub fun dd_copy(input_file: Text, output_file: Text, seek: Int) {
+    $ dd if={input_file} of={output_file} seek={seek} conv=notrunc $ failed {
+        echo "dd failed to copy {input_file} on {output_file}"
+    }
+}
+
+pub fun mkfs_fat(type: Int, image: Text) {
+    $ mkfs.fat -F {type} {image} $ failed {
+        echo "Failed to format {image}  to FAT{type}"
+    }
+}
+
+pub fun mcopy(image: Text, file: Text, dir: Text) {
+    $ mcopy -i {image} {file} {dir} $ failed {
+        echo "Failed to copy {file} to {dir} in FAT image {image}"
+    }
+}
