@@ -1,7 +1,7 @@
 # The Benix Operating System
 Benix is a small 32-bit hobby operating system for x86 I made for fun and learning. It is written in Assembly (Intel syntax) and C. Every part of the OS has been made from scratch, from the bootloader to the user space.
 
-![Benix showcase 0][assets/benix_showcase0.png]
+![Benix showcase 0](assets/benix_showcase0.png)
 
 ## Features
 ### Drivers
