@@ -1,3 +1,4 @@
+#include <string.h>
 #include <syscall.h>
 #include <cli.h>
 #include <stdio.h>
@@ -9,6 +10,13 @@ void main() {
 
     if (argc < 2) {
         printf("Filename required\n");
+        return;
+    }
+
+    if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
+        printf("show -- displays the content of a file in ASCII\n");
+        printf("Usage: show <filename>\n");
+        printf("-h / --help                 : display this message\n");
         return;
     }
 

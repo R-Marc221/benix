@@ -32,6 +32,7 @@ syscall_fread:
 syscall_lsdir:
     mov eax, 5
     mov ebx, [esp + 4]
+    mov ecx, [esp + 8]
     int 0x80
     ret
 

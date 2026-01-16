@@ -12,6 +12,22 @@
 #define NAME_CHARS                      8
 #define EXTENSION_CHARS                 3
 
+#define ENTRY_SIZE                      32
+#define SUBDIR_BYTES                    4096
+#define SUBDIR_ENTRIES                  SUBDIR_BYTES / ENTRY_SIZE
+
+#define ATTR_READ_ONLY                  0x01
+#define ATTR_HIDDEN                     0x02
+#define ATTR_SYSTEM                     0x04
+#define ATTR_VOLUME_ID                  0x08
+#define ATTR_DIRECTORY                  0x10
+#define ATTR_ARCHIVE                    0x20
+#define ATTR_REMOVED                    0xe5
+#define ATTR_LFN                        (ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID)
+
+#define PATH_SEPARATOR                  '/'
+#define DIR_ROOT                        "/"
+
 // BIOS Parameter Block (BPB)
 struct __attribute__((packed)) FAT12_BPB {
     u8 jmp[3];                  // jmp + nop
@@ -61,8 +77,13 @@ struct DriverFS_FAT12 {
 
     u16 (*get_next_cluster)(u16 cluster);
     void (*read_cluster)(u16 cluster, voidptr buffer);
+    u32 (*read_clusters)(u16 cluster, string buffer, u32 bytes);
+    u32 (*read_directory)(bool is_root, u16 cluster, struct FAT12_DirectoryEntry* out, u32 entries);
+    bool (*find_entry)(bool is_root, u16 cluster, const string formatted, struct FAT12_DirectoryEntry* out);
+    bool (*resolve_path)(const string path, struct FAT12_DirectoryEntry* out);
+
     i32 (*read_file)(const string filename, voidptr buffer, u32 buffer_size);
-    i32 (*read_dir)(string buffer);
+    i32 (*read_dir)(const string path, string buffer);
     i32 (*lookup)(const string filename);
 };
 

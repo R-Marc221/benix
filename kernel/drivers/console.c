@@ -14,7 +14,7 @@ static void move_cursor(i32 x, i32 y) {
     driver_console.driver_vga->move_cursor(x, y);
 
     if (0 > x || x > driver_console.width || 0 > y || y > driver_console.height) {
-        driver_console.cursor.x = 0;
+        driver_console.cursor.x = CURSOR_DEFAULT_X;
         driver_console.cursor.y++;
     }
 }
@@ -26,38 +26,38 @@ static void set_cursor_color(u8 fg, u8 bg) {
 
 static void putchar(u8 c) {
     switch (c) {
-        case '\n':
-            driver_console.cursor.move(0, driver_console.cursor.y + 1);
+        case CHAR_NEWLINE:
+            driver_console.cursor.move(CURSOR_DEFAULT_X, driver_console.cursor.y + 1);
             break;
 
-        case '\r':
-            driver_console.cursor.move(0, driver_console.cursor.y);
+        case CHAR_CARRIAGE_RETURN:
+            driver_console.cursor.move(CURSOR_DEFAULT_X, driver_console.cursor.y);
             break;
 
-        case '\b':
+        case CHAR_BACKSPACE:
             if (driver_console.cursor.x > 0)
-                driver_console.cursor.move(driver_console.cursor.x - 1, driver_console.cursor.y);
+                driver_console.cursor.move(driver_console.cursor.x - BACKSPACE_LENGTH, driver_console.cursor.y);
             break;
 
-        case '\t':
-            driver_console.cursor.move(driver_console.cursor.x + 4, driver_console.cursor.y);
+        case CHAR_TAB:
+            driver_console.cursor.move(driver_console.cursor.x + TAB_LENGTH, driver_console.cursor.y);
             break;
 
         default:
             driver_console.driver_vga->putchar(c, driver_console.cursor.fg, driver_console.cursor.bg, driver_console.cursor.x, driver_console.cursor.y);
-            move_cursor(driver_console.cursor.x + 1, driver_console.cursor.y);
+            move_cursor(driver_console.cursor.x + CURSOR_STEP, driver_console.cursor.y);
             break;
     }
 
     if (driver_console.cursor.y >= driver_console.height) {
-        driver_console.driver_vga->clear(driver_console.cursor.fg, driver_console.cursor.bg);
-        driver_console.cursor.move(0, 0);
+        driver_console.scrollup(LINES_TO_SCROLL);
+        move_cursor(CURSOR_DEFAULT_X, driver_console.height - 1);
     }
 }
 
 static void print(string s) {
     i32 i = 0;
-    while (s[i] != '\0') {
+    while (s[i] != CHAR_NULL) {
         driver_console.putchar(s[i]);
         i++;
     }
@@ -65,7 +65,11 @@ static void print(string s) {
 
 static void clear(void) {
     driver_console.driver_vga->clear(driver_console.cursor.fg, driver_console.cursor.bg);
-    driver_console.cursor.move(0, 0);
+    driver_console.cursor.move(CURSOR_DEFAULT_X, CURSOR_DEFAULT_Y);
+}
+
+static void scrollup(u32 lines) {
+    driver_console.driver_vga->scrollup(lines, driver_console.cursor.fg, driver_console.cursor.bg);
 }
 
 void init_driver_console(struct DriverVGA *driver_vga) {
@@ -85,6 +89,7 @@ void init_driver_console(struct DriverVGA *driver_vga) {
     driver_console.putchar = putchar;
     driver_console.print = print;
     driver_console.clear = clear;
+    driver_console.scrollup = scrollup;
 }
 
 struct DriverConsole* get_driver_console(void) {

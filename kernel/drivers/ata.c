@@ -47,7 +47,7 @@ static void identify(u16* buffer) {
 static void read(u32 lba, u16* buffer) {
     ata.wait_busy();
 
-    OUTB(ATA_DRIVE_HEAD, 0xe0 | 0x10 | ((lba >> 24) & 0x0f))
+    OUTB(ATA_DRIVE_HEAD, 0xe0 | ((lba >> 24) & 0x0f))
     OUTB(ATA_SECTOR_COUNT, 1)
     OUTB(ATA_LBA_LOW, (u8)(lba & 0xff))
     OUTB(ATA_LBA_MIDDLE, (u8)((lba >> 8) & 0xff))

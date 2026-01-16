@@ -2,6 +2,9 @@
 ;
 ; This program is very minimalist, because at this stage, our goal is not to load the kernel but to exit the
 ; boot sector, 512 bytes (size of 1 MBR sector) is not enough for what could come next.
+;
+; NOTE: this boot sector is designed for FAT12 only!
+;
 ; We do the following things in order:
 ; 1. Initialize the segments at 0x7c0:0
 ; 2. Set the stack at 0x8000 + 0xf000
@@ -14,6 +17,28 @@
 [bits 16]
 [org 0x7c00]
 
+jmp short start
+nop
+
+OEMLabel:                   db      "BENXBOOT"
+BytesPerSector:             dw      512
+SectorsPerCluster:          db      1
+ReservedSectors:	        dw      100
+NumberOfFats:       		db      2
+RootDirEntries:             dw      224
+LogicalSectors:     		dw      2880
+MediumByte:                 db      0x0f0
+SectorsPerFat:        		dw      9
+SectorsPerTrack:    		dw      18
+Sides:			            dw      2
+HiddenSectors:		        dd      0
+LargeSectors:		        dd      0
+DriveNo:			        dw      0
+Signature:		            db      41                  ; floppy
+VolumeID:                   dd      0
+VolumeLabel:		        db      "BENIX      "
+FileSystem:		            db      "FAT12   "
+
 start:
     xor ax, ax
     mov ds, ax
@@ -24,7 +49,7 @@ start:
     mov sp, 0xf000
     sti
 
-    mov [driveno], dl
+    mov [DriveNo], dl
 
     xor ah, ah
     mov al, 0x03
@@ -40,12 +65,12 @@ start:
     mov ch, 0x00
     mov cl, 0x02            ; STAGE2 MUST BE AT SECTOR 2
     mov dh, 0x00
-    mov dl, [driveno]
+    mov dl, [DriveNo]
     int 0x13
     jc reboot
     pop es
 
-    mov dl, [driveno]       ; set driveno in dl so that stage2 can recover it
+    mov dl, [DriveNo]       ; set DriveNo in dl so that stage2 can recover it
 
     jmp 0x7e0:0
 
@@ -82,7 +107,6 @@ print:
 
     ret
 
-driveno:                    db      0
 reboot_msg:                 db      "Disk error! Press a key to reboot...", 0
 
 ; fill the sector with zeroes

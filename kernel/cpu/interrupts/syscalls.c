@@ -32,7 +32,7 @@ void syscall_handler(struct SyscallRegisters* r) {
             break;
 
         case 5:
-            lsdir((string)r->ebx);
+            lsdir((string)r->ebx, (string)r->ecx);
             break;
 
         case 6:

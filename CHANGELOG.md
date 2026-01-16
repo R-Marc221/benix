@@ -1,5 +1,23 @@
 # Benix changelog
 
+## Version 0.0.3 (UNFINISHED)
+- General:
+    - improved `.gitignore`
+- Benlibc:
+    - added `limits.h`
+- Userspace:
+    - added `LICENSE.txt`
+    - reorganized files and directories
+    - edited `README.txt`
+- Drivers:
+    - FAT12 driver supports directories
+    - VGA driver supports scrollup
+- Bootloader:
+    - added BPB
+- Build:
+    - only one disk image is needed (instead of two)
+    - replaced build scripts by the Benix installer
+
 ## Version 0.0.2
 - General:
     - updated build instructions in `README.md`

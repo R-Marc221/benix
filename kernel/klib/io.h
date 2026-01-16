@@ -35,8 +35,8 @@ void itoa(i32 i, string buffer, i32 base);
 
 // read bytes from a file from the disk and stores its content in a buffer
 i32 fread(const string path, u8* buffer, u32 size);
-// read the entries of the root directory and store them in a buffer
-// the entries are separated by whitespaces
-void lsdir(string buffer);
+// read the entries of a directory and store them in a buffer
+// the entries are separated by newlines
+void lsdir(const string path, string buffer);
 // return a pointer to an entry in the root directory or NULL if the file does not exist
 i32 findfile(string path);

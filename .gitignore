@@ -1,6 +1,22 @@
+# Hidden directories
 .vscode/
 .cache/
+
+# Build directories
 binaries/
 obj/
 images/
+
+# Special files
 compile_commands.json
+TODO.md
+
+# Binaries
+*.bin
+*.elf
+*.exe
+
+# Images
+*.img
+*.hdd
+*.iso

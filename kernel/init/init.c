@@ -63,10 +63,11 @@ void install_drivers(void) {
 
 void install_proc(void) {
     init_program_loader();
-    if (!findfile("cash")) {
-        error("CASH not found");
+    if (!findfile("bin/cash")) {
+        error("bin/cash not found");
+        return;
     } else {
-        get_program_loader()->load("cash", 512 * 10, SHELL_ADDRESS, NULL);
+        get_program_loader()->load("bin/cash", 512 * 10, SHELL_ADDRESS, NULL);
         info("loaded user program");
     }
 }

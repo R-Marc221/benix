@@ -14,6 +14,7 @@
 #define STD_VGA_BUFFER                  0xb8000
 #define STD_VGA_HEIGHT                  25
 #define STD_VGA_WIDTH                   80
+#define STD_VGA_SIZE                    STD_VGA_HEIGHT * STD_VGA_WIDTH
 
 #define VGA_CRT_CIR                     0x3d4
 #define VGA_CRT_CDR                     0x3d5
@@ -22,6 +23,15 @@
 #define VGA_CURSOR_END                  0x0b
 #define VGA_CURSOR_HIGH                 0x0e
 #define VGA_CURSOR_LOW                  0x0f
+
+#define VGA_ATTR_BG_SHIFT               4
+#define VGA_ATTR_FG_MASK                0x0f
+
+#define VGA_BYTE_SHIFT                  8
+#define VGA_BYTE_MASK                   0xff
+
+// some characters
+#define CHAR_WHITESPACE                 ' '
 
 // color codes
 typedef enum {
@@ -51,6 +61,7 @@ struct DriverVGA {
     void (*move_cursor)(i32 x, i32 y);
     void (*putchar)(u8 c, vga_color_t fg, vga_color_t bg, u32 x, u32 y);
     void (*clear)(vga_color_t fg, vga_color_t bg);
+    void (*scrollup)(u32 lines, vga_color_t fg, vga_color_t bg);
 };
 
 void init_driver_vga(void);

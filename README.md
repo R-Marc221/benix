@@ -29,21 +29,29 @@ git clone https://github.com/wither16x/benix
 ```
 Benix does not use BASH, ZSH or any other standard shell scripting language for its build scripts. Instead, it uses [the Amber programming language](https://github.com/amber-lang/amber). Make sure it is installed on your system and run the following command:
 ```sh
-amber scripts/build.ab
+tools/benix/benix -- build
 ```
-Now, a floppy image should be available in `images/`, with a secondary FAT12 image.
+**Note:** you should verify the version of the OS you are building first:
+```sh
+tools/benix/benix -- version
+```
+Now, a floppy image should be available as `images/benix.img`.
 If you have `qemu` and you want to try Benix on it, execute the command below:
 ```sh
-amber scripts/run.ab
+tools/benix/benix -- emulate qemu
+```
+**Note**: if you need more informations about the Benix installer, run this command:
+```sh
+tools/benix/benix -- help
 ```
 **Benix has not been tried on real hardware yet!**
 
 ## Programs
 Several programs are provided within the Benix disk image. Their source code is located inside the `programs/` directory, **but they will be moved in separated repositories soon**.
 - `cash` (Certainly Amazing SHell): the default shell for Benix
-- `ls`: displays a list of the files
-- `show <filename>`: displays the content of a file in ASCII
-- `info`: displays informations about the system (these informations are located in `osinfo.txt`)
+- `ls [dir]`: displays a list of the files
+- `show <file>`: displays the content of a file in ASCII
+- `info [option]`: displays informations about the system (these informations are located in `osinfo.txt`)
 - `echo [text]`: displays the given text followed by a newline in the console
 
 ## Documentation

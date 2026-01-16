@@ -4,12 +4,12 @@ LD          := ld
 
 ASMFLAGS    := -f elf32
 CFLAGS		:= -m32 -ffreestanding -nostdlib -fno-pic -fno-pie -mno-sse -mno-mmx -mno-sse2 -fno-tree-vectorize \
-				 -g -c -I. -I../../benlibc
+				 -g -c -I. -I../../../benlibc
 LDFLAGS     := -m elf_i386 -Ttext 0x120000 -entry main --oformat binary
 
 SRC_DIR     := .
-OBJ_DIR     := ../../obj/user
-TARGET      := ../../binaries/user/info
+OBJ_DIR     := ../../../obj/user
+TARGET      := ../../../binaries/user/bin/echo
 
 ASM_FILES   := $(shell find $(SRC_DIR) -name '*.asm')
 C_FILES	:= $(shell find $(SRC_DIR) -name '*.c')
@@ -24,7 +24,7 @@ OBJ_FILES := $(ASM_OBJ) $(C_OBJ)
 all: $(TARGET)
 
 $(TARGET): $(OBJ_FILES)
-	$(LD) $(LDFLAGS) -o $@ $^ ../../obj/benlibc/*.o
+	$(LD) $(LDFLAGS) -o $@ $^ ../../../obj/benlibc/*.o
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.asm
 	@mkdir -p $(dir $@)

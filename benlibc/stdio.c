@@ -1,6 +1,7 @@
 #include "stdio.h"
 #include "syscall.h"
 #include "stdlib.h"
+#include "limits.h"
 
 void putchar(int c) {
     if (c) {
@@ -11,6 +12,85 @@ void putchar(int c) {
 void puts(const char* s) {
     syscall_printstr((char*)s);
     syscall_printchar('\n');
+}
+
+void vformat(char* out, int out_sz, char* fmt, va_list args) {
+    int i = 0;
+    char buffer[32];
+
+    while (*fmt && i + 1 < out_sz) {
+        if (*fmt == '%') {
+            fmt++;
+
+            switch (*fmt) {
+                case 'c': {
+                    char ch = (char)va_arg(args, int);
+                    out[i++] = ch;
+                    break;
+                }
+
+                case 's': {
+                    char* str = va_arg(args, char*);
+                    while (*str && i + 1 < out_sz)
+                        out[i++] = *str++;
+                    break;
+                }
+
+                case 'b': {
+                    int val = va_arg(args, int);
+                    itoa(val, buffer, 2);
+                    int j = 0;
+                    while (buffer[j] != '\0' && i + 1 < out_sz) {
+                        out[i++] = buffer[j++];
+                    }
+                    break;
+                }
+
+                case 'o': {
+                    int val = va_arg(args, int);
+                    itoa(val, buffer, 8);
+                    int j = 0;
+                    while (buffer[j] != '\0' && i + 1 < out_sz) {
+                        out[i++] = buffer[j++];
+                    }
+                    break;
+                }
+
+                case 'd': {
+                    int val = va_arg(args, int);
+                    itoa(val, buffer, 10);
+                    int j = 0;
+                    while (buffer[j] != '\0' && i + 1 < out_sz) {
+                        out[i++] = buffer[j++];
+                    }
+                    break;
+                }
+
+                case 'x': {
+                    int val = va_arg(args, int);
+                    itoa(val, buffer, 16);
+                    int j = 0;
+                    while (buffer[j] != '\0' && i + 1 < out_sz) {
+                        out[i++] = buffer[j++];
+                    }
+                    break;
+                }
+
+                case '%':
+                    out[i++] = '%';
+                    break;
+
+                default:
+                    break;
+            }
+        } else {
+            out[i++] = *fmt;
+        }
+
+        fmt++;
+    }
+
+    out[i] = '\0';
 }
 
 void vprintf(const char* fmt, va_list args) {
@@ -74,6 +154,24 @@ void vprintf(const char* fmt, va_list args) {
 
         fmt++;
     }
+}
+
+void vsprintf(char *buf, char *fmt, va_list args) {
+    vformat(buf, INT_MAX, fmt, args);
+}
+
+void sprintf(char *buf, char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    va_end(args);
+}
+
+void snprintf(char *buf, int len, char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    vformat(buf, len, fmt, args);
+    va_end(args);
 }
 
 void printf(const char* fmt, ...) {
