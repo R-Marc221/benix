@@ -6,14 +6,18 @@
 - Benlibc:
     - added `limits.h`
 - Userspace:
+    - removed syscall 7 (`ffind`)
+    - better error handling in user programs
     - added `LICENSE.txt`
     - reorganized files and directories
     - edited `README.txt`
 - Drivers:
+    - big refactorisation of FAT12 driver
     - FAT12 driver supports directories
     - VGA driver supports scrollup
 - Bootloader:
-    - added BPB
+    - cleaned up `gdt.asm`
+    - added FAT12 BPB
 - Build:
     - only one disk image is needed (instead of two)
     - replaced build scripts by the Benix installer

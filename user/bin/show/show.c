@@ -28,10 +28,12 @@ void main() {
         out how to fix this bug... Please tell me if you have any idea!
     */
     printf("\0");
-    if (syscall_ffind(argv[1])) {
-        fread(argv[1], buffer, sizeof(buffer));
-        printf("%s", buffer);
+    int result = fread(argv[1], buffer, sizeof(buffer));
+    if (result == -1) {
+        printf("File not found: %s\n", argv[1]);
+    } else if (result == -2) {
+        printf("Is a directory: %s\n", argv[1]);
     } else {
-        printf("File not found\n");
+        printf("%s", buffer);
     }
 }

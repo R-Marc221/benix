@@ -245,8 +245,8 @@ i32 fread(const string path, u8* buffer, u32 size) {
     return get_fsdriver_fat12()->read_file(path, buffer, size);
 }
 
-void lsdir(const string path, string buffer) {
-    get_fsdriver_fat12()->read_dir(path, buffer);
+i32 lsdir(const string path, string buffer) {
+    return get_fsdriver_fat12()->read_dir(path, buffer);
 }
 
 i32 findfile(string path) {

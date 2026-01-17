@@ -28,6 +28,10 @@ void main() {
     char* sh_argv[MAX_ARGUMENTS];
     int sh_argc;
 
+    char prog_path[MAX_CHARS / MAX_ARGUMENTS];
+    int prog_address;
+    int result;
+
     syscall_cls();
 
     printf("CASH - Certainly Amazing SHell\n");
@@ -69,17 +73,16 @@ void main() {
             continue;
         }
 
-        char prog_path[MAX_CHARS / MAX_ARGUMENTS];
+        snprintf(prog_path, sizeof(prog_path), "%s", sh_argv[0]);
+        prog_address = (strcmp(prog_path, "bin/cash") == 0) ? SHELL_ADDRESS : PROGRAM_ADDRESS;
 
-        /*
-            I know that this is VERY BAD AND DIRTY, but I wanted to keep things simple for this version.
-            When CASH will evolve, I'll add a PATH variable to replace this monstruosity.
-        */
-        if (syscall_ffind(sh_argv[0])) {
-            memcpy(prog_path, sh_argv[0], strlen(prog_path));
-        } else {
+        result = fread(prog_path, (char*)prog_address, 512 * 10);
+        if (result < 0) {
             snprintf(prog_path, sizeof(prog_path), "bin/%s", sh_argv[0]);
-            if (!syscall_ffind(prog_path)) {
+            prog_address = (strcmp(prog_path, "bin/cash") == 0) ? SHELL_ADDRESS : PROGRAM_ADDRESS;
+
+            result = fread(prog_path, (char*)prog_address, 512 * 10);
+            if (result < 0) {
                 printf("Invalid command: %s\n", sh_argv[0]);
                 continue;
             }
@@ -90,8 +93,6 @@ void main() {
         cliargs.argv = sh_argv;
 
         memmove((void*)CLIARGS_ADDRESS, &cliargs, sizeof(cliargs));
-        int prog_address = strcmp(prog_path, "bin/cash") == 0 ? SHELL_ADDRESS : PROGRAM_ADDRESS;
-        fread(prog_path, (char*)prog_address, 512 * 10);
 
         void (*program)(void) = (void (*)())prog_address;
         program();

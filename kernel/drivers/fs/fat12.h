@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "drivers/ata.h"
 #include "klib/types.h"
 
 #define FILENAME_CHARS                  11
@@ -13,8 +14,6 @@
 #define EXTENSION_CHARS                 3
 
 #define ENTRY_SIZE                      32
-#define SUBDIR_BYTES                    4096
-#define SUBDIR_ENTRIES                  SUBDIR_BYTES / ENTRY_SIZE
 
 #define ATTR_READ_ONLY                  0x01
 #define ATTR_HIDDEN                     0x02
@@ -69,6 +68,14 @@ struct __attribute__((packed)) FAT12_DirectoryEntry {
     u32 file_size;
 };
 
+struct FAT12_DirectoryIterator {
+    bool is_root;
+    u32 sector;
+    u32 offset;
+    u16 current_cluster;
+    u8 sector_buffer[SECTOR_SIZE];
+};
+
 struct DriverFS_FAT12 {
     struct FAT12_BPB bpb;
     u32 fat_start_sector;
@@ -78,9 +85,12 @@ struct DriverFS_FAT12 {
     u16 (*get_next_cluster)(u16 cluster);
     void (*read_cluster)(u16 cluster, voidptr buffer);
     u32 (*read_clusters)(u16 cluster, string buffer, u32 bytes);
-    u32 (*read_directory)(bool is_root, u16 cluster, struct FAT12_DirectoryEntry* out, u32 entries);
     bool (*find_entry)(bool is_root, u16 cluster, const string formatted, struct FAT12_DirectoryEntry* out);
     bool (*resolve_path)(const string path, struct FAT12_DirectoryEntry* out);
+
+    void (*dir_open)(bool is_root, struct FAT12_DirectoryIterator* iter, u16 first_cluster);
+    bool (*dir_advance)(struct FAT12_DirectoryIterator* iter);
+    bool (*dir_next)(struct FAT12_DirectoryIterator* iter, struct FAT12_DirectoryEntry* out);
 
     i32 (*read_file)(const string filename, voidptr buffer, u32 buffer_size);
     i32 (*read_dir)(const string path, string buffer);

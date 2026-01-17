@@ -18,8 +18,13 @@ void main() {
         printf("[dir]                       : display the content of the directory\n");
         return;
     } else {
-        syscall_lsdir(argv[1], buffer);
+        int result = syscall_lsdir(argv[1], buffer);
+        if (result == -1) {
+            printf("Directory not found: %s\n", argv[1]);
+        } else if (result == -2) {
+            printf("Not a directory: %s\n", argv[1]);
+        } else {
+            printf("%s", buffer);
+        }
     }
-
-    printf("%s", buffer);
 }

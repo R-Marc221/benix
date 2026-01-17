@@ -11,6 +11,7 @@
 #include "klib/string.h"
 #include "klib/null.h"
 #include "klib/bool.h"
+#include "klib/types.h"
 
 static struct DriverFS_FAT12 fs;
 
@@ -81,58 +82,15 @@ static u32 read_clusters(u16 cluster, string buffer, u32 bytes) {
     return total;
 }
 
-static u32 read_directory(bool is_root, u16 cluster, struct FAT12_DirectoryEntry* out, u32 entries) {
-    u32 count = 0;
-
-    if (is_root) {
-        u32 entries = fs.bpb.rootdir_entry_count;
-        u32 sectors = (entries * ENTRY_SIZE + SECTOR_SIZE - 1) / SECTOR_SIZE;
-        u8 sector_buffer[SECTOR_SIZE];
-
-        for (u32 i = 0; i < sectors && count < entries; i++) {
-            get_driver_ata()->read(fs.rootdir_start_sector + i, (u16*)sector_buffer);
-
-            for (u32 j = 0; j < SECTOR_SIZE && count < entries; j += ENTRY_SIZE) {
-                struct FAT12_DirectoryEntry* e = (struct FAT12_DirectoryEntry*)&sector_buffer[j];
-
-                if (e->name[0] == 0) {
-                    return count;
-                }
-                if ((e->attributes & ATTR_LFN) == ATTR_LFN) {
-                    continue;
-                }
-
-                out[count++] = *e;
-            }
-        }
-    } else {
-        u8 buffer[SUBDIR_BYTES];
-        u32 bytes = read_clusters(cluster, (string)buffer, sizeof(buffer));
-
-        for (u32 offset = 0; offset + ENTRY_SIZE <= bytes && count <= entries; offset += ENTRY_SIZE) {
-            struct FAT12_DirectoryEntry* e = (struct FAT12_DirectoryEntry*)(buffer + offset);
-
-            if (e->name[0] == 0) {
-                break;
-            }
-            if ((e->attributes & ATTR_LFN) == ATTR_LFN) {
-                continue;
-            }
-
-            out[count++] = *e;
-        }
-    }
-
-    return count;
-}
-
 bool find_entry(bool is_root, u16 cluster, const string formatted, struct FAT12_DirectoryEntry* out) {
-    struct FAT12_DirectoryEntry entries[SUBDIR_ENTRIES];
-    u32 n = read_directory(is_root, cluster, entries, SUBDIR_ENTRIES);
+    struct FAT12_DirectoryIterator iter;
+    struct FAT12_DirectoryEntry e;
 
-    for (u32 i = 0; i < n; i++) {
-        if (memcmp(entries[i].name, formatted, FILENAME_CHARS) == 0) {
-            *out = entries[i];
+    fs.dir_open(is_root, &iter, cluster);
+    
+    while (fs.dir_next(&iter, &e)) {
+        if (memcmp(e.name, formatted, FILENAME_CHARS) == 0) {
+            *out = e;
             return true;
         }
     }
@@ -170,6 +128,70 @@ bool resolve_path(const string path, struct FAT12_DirectoryEntry* out) {
     return true;
 }
 
+static void dir_open(bool is_root, struct FAT12_DirectoryIterator* iter, u16 first_cluster) {
+    iter->is_root = is_root;
+    iter->current_cluster = first_cluster;
+
+    if (is_root)
+        iter->sector = fs.rootdir_start_sector;
+    else
+        iter->sector = fs.data_start_sector + (first_cluster - 2) * fs.bpb.sectors_per_cluster;
+
+    iter->offset = 0;
+    get_driver_ata()->read(iter->sector, (u16*)iter->sector_buffer);
+}
+
+static bool dir_advance(struct FAT12_DirectoryIterator* iter) {
+    u32 max_sectors, rel;
+
+    iter->offset += ENTRY_SIZE;
+    if (iter->offset < SECTOR_SIZE) {
+        return true;
+    }
+
+    iter->offset = 0;
+    iter->sector++;
+
+    if (iter->is_root) {
+        max_sectors = ((fs.bpb.rootdir_entry_count * ENTRY_SIZE) + SECTOR_SIZE - 1) / SECTOR_SIZE;
+        if (iter->sector >= fs.rootdir_start_sector + max_sectors) {
+            return false;
+        }
+    } else {
+        rel = iter->sector - (fs.data_start_sector + (iter->current_cluster - 2) * fs.bpb.sectors_per_cluster);
+        if (rel >= fs.bpb.sectors_per_cluster) {
+            iter->current_cluster = get_next_cluster(iter->current_cluster);
+            if (iter->current_cluster >= 0xff8) {
+                return false;
+            }
+            iter->sector = fs.data_start_sector + (iter->current_cluster - 2) * fs.bpb.sectors_per_cluster;
+        }
+    }
+
+    get_driver_ata()->read(iter->sector, (u16*)iter->sector_buffer);
+
+    return true;
+}
+
+static bool dir_next(struct FAT12_DirectoryIterator* iter, struct FAT12_DirectoryEntry* out) {
+    while (true) {
+        struct FAT12_DirectoryEntry* e = (struct FAT12_DirectoryEntry*)(iter->sector_buffer + iter->offset);
+        
+        if (e->name[0] == 0) {
+            return false;
+        }
+        if (e->name[0] != ATTR_REMOVED && (e->attributes & ATTR_LFN) != ATTR_LFN) {
+            *out = *e;
+            dir_advance(iter);
+            return true;
+        }
+
+        if (!dir_advance(iter)) {
+            return false;
+        }
+    }
+}
+
 /*
     -1: file not found
     -2: is a directory
@@ -199,10 +221,14 @@ static i32 read_file(const string filename, voidptr buffer, u32 buffer_size) {
 */
 static i32 read_dir(const string path, string buffer) {
     struct FAT12_DirectoryEntry dir;
+    struct FAT12_DirectoryIterator iter;
+    struct FAT12_DirectoryEntry entry;
+    u32 out;
+
     bool is_root = false;
     u16 cluster = 0;
 
-    if (path == NULL || strcmp(path, DIR_ROOT) == 0 || *path == 0) {
+    if (strcmp(path, DIR_ROOT) == 0) {
         is_root = true;
     } else {
         if (!resolve_path(path, &dir)) {
@@ -214,23 +240,22 @@ static i32 read_dir(const string path, string buffer) {
         cluster = dir.first_cluster_low;
     }
 
-    struct FAT12_DirectoryEntry entries[SUBDIR_ENTRIES];
-    u32 count = read_directory(is_root, cluster, entries, SUBDIR_ENTRIES);
+    fs.dir_open(is_root, &iter, cluster);
 
-    u32 out = 0;
-    for (u32 i = 0; i < count; i++) {
-        if (entries[i].name[0] == ATTR_REMOVED) {
+    out = 0;
+    while (fs.dir_next(&iter, &entry)) {
+        if (entry.name[0] == ATTR_REMOVED) {
             continue;
         }
 
-        for (u32 j = 0; j < FILENAME_CHARS; j++) {
-            buffer[out++] = entries[i].name[j];
+        for (u32 i = 0; i < FILENAME_CHARS; i++) {
+            buffer[out++] = entry.name[i];
         }
         buffer[out++] = '\n';
     }
 
     buffer[out] = '\0';
-    return (i32)count;
+    return (i32)out;
 }
 
 static i32 lookup(const string filename) {
@@ -242,9 +267,11 @@ void init_fsdriver_fat12(void) {
     fs.get_next_cluster = get_next_cluster;
     fs.read_cluster = read_cluster;
     fs.read_clusters = read_clusters;
-    fs.read_directory = read_directory;
     fs.find_entry = find_entry;
     fs.resolve_path = resolve_path;
+    fs.dir_open = dir_open;
+    fs.dir_advance = dir_advance;
+    fs.dir_next = dir_next;
     fs.read_file = read_file;
     fs.read_dir = read_dir;
     fs.lookup = lookup;

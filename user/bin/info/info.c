@@ -18,7 +18,7 @@ void main() {
         version_found = fread("sys/version.txt", buffer_version, sizeof(buffer_version));
         arch_found = fread("sys/arch.txt", buffer_arch, sizeof(buffer_arch));
 
-        if (!name_found || !version_found || !arch_found) {
+        if (name_found == -1 || version_found == -1 || arch_found == -1) {
             printf("Missing information files in sys/\n");
             return;
         }
@@ -35,7 +35,7 @@ void main() {
         return;
     } else if (strcmp(argv[1], "-n") == 0 || strcmp(argv[1], "--name") == 0) {
         name_found = fread("sys/name.txt", buffer_name, sizeof(buffer_name));
-        if (!name_found) {
+        if (name_found == -1) {
             printf("Could not find sys/name.txt\n");
             return;
         }
@@ -43,7 +43,7 @@ void main() {
         printf("%s\n", buffer_name);
     } else if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
         version_found = fread("sys/version.txt", buffer_version, sizeof(buffer_version));
-        if (!version_found) {
+        if (version_found == -1) {
             printf("Could not find sys/version.txt\n");
             return;
         }
@@ -51,7 +51,7 @@ void main() {
         printf("%s\n", buffer_version);
     } else if (strcmp(argv[1], "-a") == 0 || strcmp(argv[1], "--architecture") == 0) {
         arch_found = fread("sys/arch.txt", buffer_arch, sizeof(buffer_arch));
-        if (!arch_found) {
+        if (arch_found == -1) {
             printf("Could not find sys/arch.txt\n");
             return;
         }

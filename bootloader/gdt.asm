@@ -6,11 +6,21 @@
 [bits 16]
 
 gdt:
-    db 0, 0, 0, 0, 0, 0, 0, 0
+    dq 0
 gdt_cs:
-    db 0xff, 0xff, 0x0, 0x0, 0x0, 10011011b, 11011111b, 0
+    dw 0xffff
+    dw 0
+    db 0
+    db 10011011b
+    db 11011111b
+    db 0
 gdt_ds:
-    db 0xff, 0xff, 0x0, 0x0, 0x0, 10010011b, 11011111b, 0
+    dw 0xffff
+    dw 0
+    db 0
+    db 10010011b
+    db 11011111b
+    db 0
 gdtend:
 
 gdtptr:
