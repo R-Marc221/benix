@@ -2,6 +2,7 @@
 
 ## Version 0.0.3 (UNFINISHED)
 - General:
+    - added `memory_map.txt`
     - improved `.gitignore`
 - Benlibc:
     - added `limits.h`
